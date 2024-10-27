@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avinor Flight Status</title>
+    <link rel="stylesheet" href="static/styles.css"> 
+</head>
+<body>
+    <h1>Welcome to Avinor Flight Status</h1>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+<!--form for user input to search for flight information -->
+    <form method="POST">
+        <label for="airport_code">Enter IATA code of the airport (e.g., OSL for Oslo Airport):</label>
+        <input type="text" id="airport_code" name="airport_code" value="{{ airport_code }}" required>
+    
+        <label for="direction">Do you want to track Arrivals or Departures?</label>
+        <select id="direction" name="direction">
+            <option value="">Both</option>
+            <option value="A" {% if direction == 'A' %}selected{% endif %}>Arrivals</option>
+            <option value="D" {% if direction == 'D' %}selected{% endif %}>Departures</option>
+        </select>
+    
+        <label for="airline">Filter by IATA code of the Airline:</label>
+        <input type="text" id="airline" name="airline" value="{{ airline }}" placeholder="e.g., SK">
+    
+        <label for="flight_number">Search by Flight Number:</label>
+        <input type="text" id="flight_number" name="flight_number" value="{{ flight_number }}" placeholder="e.g., SK1234">
+    
+        <label for="sort_by_status">Sort by Status:</label>
+        <select id="sort_by_status" name="sort_by_status">
+            <option value="">No Sorting</option>
+            <option value="On Time" {% if sort_by_status == 'On Time' %}selected{% endif %}>On Time</option>
+            <option value="Delayed" {% if sort_by_status == 'Delayed' %}selected{% endif %}>Delayed</option>
+            <option value="Canceled" {% if sort_by_status == 'Canceled' %}selected{% endif %}>Canceled</option>
+        </select>
+    
+        <input type="submit" value="Get Flights">
+    </form>
+
+ <!-- display flight information if available -->
+    {% if flights %}
+        <h2>Flight Information:</h2>
+        <table>
+            <tr>
+                <th>Flight ID</th>
+                <th>Scheduled Time</th>
+                <th>Airport</th>
+                <th>Airline</th>
+                <th>Arrival/Departure</th>
+                <th>Status Code</th>
+                <th>Status Time</th>
+                <th>Gate</th>
+                <th>Belt Number</th>
+            </tr>
+            {% for flight in flights %}
+            <tr>
+                <td>{{ flight['flightId'] or 'N/A' }}</td>
+                <td>{{ flight['scheduled_time'] or 'N/A' }}</td>
+                <td>{{ flight['airport'] or 'N/A' }}</td>
+                <td>{{ flight['airline'] or 'N/A' }}</td>
+                <td>{{ 'Arrival' if flight['arrival_departure'] == 'A' else 'Departure' }}</td>
+                <td>{{ flight['status_code'] or 'N/A' }}</td>
+                <td>{{ flight['status_time'] or 'N/A' }}</td>
+                <td>{{ flight['gate'] or 'N/A' }}</td>
+                <td>{{ flight['belt_number'] or 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+</body>
+</html>
